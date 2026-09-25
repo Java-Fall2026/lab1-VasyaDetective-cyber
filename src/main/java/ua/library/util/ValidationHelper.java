@@ -2,13 +2,18 @@ package ua.library.util;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.List;
 
 class ValidationHelper {
 
     static void checkNotBlank(String value, String expected) {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException("Очікувалось " + expected + ", отримано: " + value);
+        }
+    }
+
+    static void checkPattern(String value, String regex, String expectedFormat) {
+        if (!value.matches(regex)) {
+            throw new IllegalArgumentException("Некоректний формат для " + expectedFormat + ". Отримано: " + value);
         }
     }
 
@@ -31,13 +36,6 @@ class ValidationHelper {
         }
     }
 
-    static void checkEnum(String value, List<String> allowed) {
-        checkNotBlank(value, "значення зі списку " + allowed);
-        if (!allowed.contains(value.toUpperCase())) {
-            throw new IllegalArgumentException("Очікувалось " + allowed + ", отримано: " + value);
-        }
-    }
-
     static void checkDateNotFuture(LocalDate date) {
         checkNotNull(date, "дата");
         if (date.isAfter(LocalDate.now())) {
@@ -48,12 +46,6 @@ class ValidationHelper {
     static void checkDateAfterOrEqual(LocalDate start, LocalDate end) {
         if (end != null && start != null && end.isBefore(start)) {
             throw new IllegalArgumentException("Очікувалась дата після або рівна " + start + ", отримано: " + end);
-        }
-    }
-
-    static void checkDateStrictlyAfter(LocalDate start, LocalDate end) {
-        if (end != null && start != null && !end.isAfter(start)) {
-            throw new IllegalArgumentException("Очікувалась дата строго після " + start + ", отримано: " + end);
         }
     }
 }
