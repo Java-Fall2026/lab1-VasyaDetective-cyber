@@ -2,46 +2,37 @@ package ua.library.model;
 
 import ua.common.BaseEntity;
 import ua.library.util.LibraryUtils;
-
 import java.util.Objects;
 
 public class Book extends BaseEntity {
-
     private final String isbn;
     private final String title;
     private final Author author;
-    private final int publishYear;
+    private final String genre;
+    private final int publishedYear;
 
-    private Book(String isbn, String title, Author author, int publishYear) {
+    private Book(String isbn, String title, Author author, String genre, int publishedYear) {
         super();
         this.isbn = LibraryUtils.processIsbn(isbn);
-        this.title = LibraryUtils.processString(title, "назва книги");
-        LibraryUtils.requireNotNull(author, "автор");
-        LibraryUtils.validatePublishYear(publishYear, author.getBirthDate().getYear());
-        
+        this.title = LibraryUtils.processString(title, "Book title");
+        LibraryUtils.requireNotNull(author, "Author");
         this.author = author;
-        this.publishYear = publishYear;
+        
+        this.genre = LibraryUtils.processGenre(genre);
+        
+        LibraryUtils.validatePublishYear(publishedYear, author.getBirthYear());
+        this.publishedYear = publishedYear;
     }
 
-    public static Book of(String isbn, String title, Author author, int publishYear) {
-        return new Book(isbn, title, author, publishYear);
+    public static Book of(String isbn, String title, Author author, String genre, int publishedYear) {
+        return new Book(isbn, title, author, genre, publishedYear);
     }
 
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public Author getAuthor() {
-        return author;
-    }
-
-    public int getPublishYear() {
-        return publishYear;
-    }
+    public String getIsbn() { return isbn; }
+    public String getTitle() { return title; }
+    public Author getAuthor() { return author; }
+    public String getGenre() { return genre; }
+    public int getPublishedYear() { return publishedYear; }
 
     @Override
     public boolean equals(Object o) {
@@ -61,8 +52,10 @@ public class Book extends BaseEntity {
         return "Book{" +
                 "isbn='" + isbn + '\'' +
                 ", title='" + title + '\'' +
-                ", author=" + author.getFullName() +
-                ", publishYear=" + publishYear +
+                ", author=" + author.getName() +
+                ", genre='" + genre + '\'' +
+                ", publishedYear=" + publishedYear +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

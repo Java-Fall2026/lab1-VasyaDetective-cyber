@@ -2,40 +2,25 @@ package ua.library.model;
 
 import ua.common.BaseEntity;
 import ua.library.util.LibraryUtils;
-
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class Reader extends BaseEntity {
-
     private final String readerTicketNumber;
     private final String fullName;
     private final LocalDate birthDate;
 
-    private Reader(String readerTicketNumber, String fullName, LocalDate birthDate) {
+    public Reader(String readerTicketNumber, String fullName, LocalDate birthDate) {
         super();
         this.readerTicketNumber = LibraryUtils.processTicketNumber(readerTicketNumber);
-        this.fullName = LibraryUtils.processString(fullName, "ПІБ читача");
-        LibraryUtils.requireNotNull(birthDate, "дата народження");
+        this.fullName = LibraryUtils.processString(fullName, "Reader full name");
         LibraryUtils.validateAge(birthDate, 14);
         this.birthDate = birthDate;
     }
 
-    public static Reader of(String readerTicketNumber, String fullName, LocalDate birthDate) {
-        return new Reader(readerTicketNumber, fullName, birthDate);
-    }
-
-    public String getReaderTicketNumber() {
-        return readerTicketNumber;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
+    public String getReaderTicketNumber() { return readerTicketNumber; }
+    public String getFullName() { return fullName; }
+    public LocalDate getBirthDate() { return birthDate; }
 
     @Override
     public boolean equals(Object o) {
@@ -56,6 +41,7 @@ public class Reader extends BaseEntity {
                 "readerTicketNumber='" + readerTicketNumber + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", birthDate=" + birthDate +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

@@ -2,49 +2,52 @@ package ua.library.model;
 
 import ua.common.BaseEntity;
 import ua.library.util.LibraryUtils;
-
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class BookLoan extends BaseEntity {
-
     private final Book book;
     private final Reader reader;
     private final LocalDate issueDate;
-    private final LocalDate returnDate;
+    private final LocalDate dueDate;
+    private LocalDate returnDate; 
+    private String status;        
 
-    private BookLoan(Book book, Reader reader, LocalDate issueDate, LocalDate returnDate) {
+    public BookLoan(Book book, Reader reader, LocalDate issueDate, LocalDate dueDate, LocalDate returnDate, String status) {
         super();
-        LibraryUtils.requireNotNull(book, "книга");
-        LibraryUtils.requireNotNull(reader, "читач");
-        LibraryUtils.requireNotNull(issueDate, "дата видачі");
-        LibraryUtils.validateNotFuture(issueDate);
-        LibraryUtils.validateAfterOrEqual(issueDate, returnDate);
-
+        LibraryUtils.requireNotNull(book, "Book");
+        LibraryUtils.requireNotNull(reader, "Reader");
         this.book = book;
         this.reader = reader;
+        
+        LibraryUtils.validateNotFuture(issueDate, "Issue date");
         this.issueDate = issueDate;
+        
+        LibraryUtils.requireNotNull(dueDate, "Due date");
+        LibraryUtils.validateStrictlyAfter(issueDate, dueDate, "Due date");
+        this.dueDate = dueDate;
+        
+        setReturnDate(returnDate);
+        setStatus(status);
+    }
+
+    public Book getBook() { return book; }
+    public Reader getReader() { return reader; }
+    public LocalDate getIssueDate() { return issueDate; }
+    public LocalDate getDueDate() { return dueDate; }
+    public LocalDate getReturnDate() { return returnDate; }
+    public String getStatus() { return status; }
+
+ 
+    public final void setReturnDate(LocalDate returnDate) {
+        if (returnDate != null) {
+            LibraryUtils.validateAfterOrEqual(this.issueDate, returnDate, "Return date");
+        }
         this.returnDate = returnDate;
     }
 
-    public static BookLoan of(Book book, Reader reader, LocalDate issueDate, LocalDate returnDate) {
-        return new BookLoan(book, reader, issueDate, returnDate);
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public Reader getReader() {
-        return reader;
-    }
-
-    public LocalDate getIssueDate() {
-        return issueDate;
-    }
-
-    public LocalDate getReturnDate() {
-        return returnDate;
+    public final void setStatus(String status) {
+        this.status = LibraryUtils.processStatus(status);
     }
 
     @Override
@@ -68,7 +71,10 @@ public class BookLoan extends BaseEntity {
                 "book=" + book.getTitle() +
                 ", reader=" + reader.getFullName() +
                 ", issueDate=" + issueDate +
+                ", dueDate=" + dueDate +
                 ", returnDate=" + returnDate +
+                ", status='" + status + '\'' +
+                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }
