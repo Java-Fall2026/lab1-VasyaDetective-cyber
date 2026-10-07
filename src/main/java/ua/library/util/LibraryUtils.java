@@ -7,8 +7,9 @@ import java.util.List;
 
 public class LibraryUtils {
     
-    private static final List<String> ALLOWED_GENRES = List.of("FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY");
-    private static final List<String> ALLOWED_STATUSES = List.of("ACTIVE", "RETURNED", "OVERDUE");
+    static final List<String> ALLOWED_GENRES = List.of("FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY");
+    static final List<String> ALLOWED_STATUSES = List.of("ACTIVE", "RETURNED", "OVERDUE");
+    static final int MIN_AUTHOR_BIRTH_YEAR = 1800;
 
     private LibraryUtils() {}
 
@@ -51,7 +52,7 @@ public class LibraryUtils {
     }
 
     public static void validateAuthorYear(int year) {
-        ValidationHelper.checkYear(year, 1800, LocalDate.now().getYear());
+        ValidationHelper.checkYear(year, MIN_AUTHOR_BIRTH_YEAR, LocalDate.now().getYear());
     }
 
     public static void validatePublishYear(int publishYear, int authorBirthYear) {
@@ -70,16 +71,13 @@ public class LibraryUtils {
         ValidationHelper.checkDateStrictlyAfter(start, end, fieldName);
     }
     
-    // --- Обчислювані методи ---
-    
     public static long loanDays(BookLoan loan) {
         return ChronoUnit.DAYS.between(loan.getIssueDate(), loan.getDueDate());
     }
     
     public static long overdueDays(BookLoan loan) {
         if (loan.getReturnDate() == null) {
-            LocalDate today = LocalDate.now();
-            return today.isAfter(loan.getDueDate()) ? ChronoUnit.DAYS.between(loan.getDueDate(), today) : 0;
+            return 0;
         }
         return loan.getReturnDate().isAfter(loan.getDueDate()) ? 
                ChronoUnit.DAYS.between(loan.getDueDate(), loan.getReturnDate()) : 0;
