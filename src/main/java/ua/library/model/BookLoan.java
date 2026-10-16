@@ -10,10 +10,10 @@ public class BookLoan extends BaseEntity {
     private final Reader reader;
     private final LocalDate issueDate;
     private final LocalDate dueDate;
-    private LocalDate returnDate; 
-    private String status;        
+    private LocalDate returnDate;
+    private LoanStatus status; 
 
-    public BookLoan(Book book, Reader reader, LocalDate issueDate, LocalDate dueDate, LocalDate returnDate, String status) {
+    public BookLoan(Book book, Reader reader, LocalDate issueDate, LocalDate dueDate, LocalDate returnDate, LoanStatus status) {
         super();
         LibraryUtils.requireNotNull(book, "Book");
         LibraryUtils.requireNotNull(reader, "Reader");
@@ -36,9 +36,8 @@ public class BookLoan extends BaseEntity {
     public LocalDate getIssueDate() { return issueDate; }
     public LocalDate getDueDate() { return dueDate; }
     public LocalDate getReturnDate() { return returnDate; }
-    public String getStatus() { return status; }
+    public LoanStatus getStatus() { return status; }
 
- 
     public final void setReturnDate(LocalDate returnDate) {
         if (returnDate != null) {
             LibraryUtils.validateAfterOrEqual(this.issueDate, returnDate, "Return date");
@@ -46,8 +45,9 @@ public class BookLoan extends BaseEntity {
         this.returnDate = returnDate;
     }
 
-    public final void setStatus(String status) {
-        this.status = LibraryUtils.processStatus(status);
+    public final void setStatus(LoanStatus status) {
+        LibraryUtils.requireNotNull(status, "Status");
+        this.status = status;
     }
 
     @Override
@@ -68,12 +68,12 @@ public class BookLoan extends BaseEntity {
     @Override
     public String toString() {
         return "BookLoan{" +
-                "book=" + book.getTitle() +
-                ", reader=" + reader.getFullName() +
+                "book=" + book.title() +
+                ", reader=" + reader.fullName() +
                 ", issueDate=" + issueDate +
                 ", dueDate=" + dueDate +
                 ", returnDate=" + returnDate +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", createdAt=" + getCreatedAt() +
                 '}';
     }
