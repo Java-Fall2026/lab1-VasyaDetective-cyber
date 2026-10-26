@@ -1,61 +1,42 @@
 package ua.library;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.library.model.Author;
 import ua.library.model.Book;
 import ua.library.model.BookLoan;
 import ua.library.model.Reader;
-import ua.library.util.LibraryUtils;
+import ua.library.util.CsvLoader;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Main {
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) {
-        Author author = Author.of("AUTH-001", "  Taras Shevchenko  ", 1814);
-        Book book = Book.of("978-966-123-456-7", "Kobzar", author, " fiction ", 1840);
-        
+        log.info("--- Starting Lab 3 demonstration ---");
+
+        List<Author> authors = CsvLoader.loadAuthors("data/authors.csv");
+        System.out.println(authors);
+
+        CsvLoader.loadAuthors("data/missing_file.csv");
+
+        Author author = Author.of("AUTH-001", "Taras Shevchenko", 1814);
+        Book book = Book.of("978-966-123-456-7", "Kobzar", author, "fiction", 1840);
         Reader reader = new Reader("TKT-001", "Ivan Franko", LocalDate.of(2005, 5, 15));
-        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), null, " active ");
-
-        System.out.println(author);
-        System.out.println(book);
-        System.out.println(reader);
-        System.out.println(loan);
-
-        try {
-            Author.of("AUTH-002", "", 1799);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
-        try {
-            new Reader("INVALID", "Lesya Ukrainka", LocalDate.of(2015, 1, 1));
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
-        try {
-            Book.of("123", "Eneida", author, "POETRY", 1842);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
+        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), null,
+                "active");
 
         try {
             loan.setStatus("UNKNOWN");
         } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            log.warn("Domain rule violation caught in setter: {}", e.getMessage());
         }
 
-        BookLoan loanCopy = new BookLoan(book, reader, LocalDate.now().minusDays(5), LocalDate.now().plusDays(10), null, "ACTIVE");
-        System.out.println(loan == loanCopy);
-        System.out.println(loan.equals(loanCopy));
-        System.out.println(loan.hashCode() == loanCopy.hashCode());
-
-        BookLoan differentLoan = new BookLoan(book, reader, LocalDate.now(), LocalDate.now().plusDays(14), null, "ACTIVE");
-        System.out.println(loan.equals(differentLoan));
-
-        System.out.println(LibraryUtils.loanDays(loan));
-        System.out.println(LibraryUtils.overdueDays(loan));
-
-        // ua.library.util.ValidationHelper.checkNotNull(author, "Author");
-        // The line above does not compile because ValidationHelper is package-private and cannot be accessed from outside the ua.library.util package.
+        log.info("--- Lab 3 demonstration finished ---");
     }
 }
+
+// ua.library.util.ValidationHelper.checkNotNull(author, "Author");
+// The line above does not compile because ValidationHelper is package-private
+// and cannot be accessed from outside the ua.library.util package.
