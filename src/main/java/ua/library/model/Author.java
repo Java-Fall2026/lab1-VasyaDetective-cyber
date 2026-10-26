@@ -9,6 +9,7 @@ public class Author extends BaseEntity {
     private final String name;
     private final int birthYear;
 
+    
     private Author(String authorCode, String name, int birthYear) {
         super();
         this.authorCode = LibraryUtils.processString(authorCode, "Author code");
