@@ -1,5 +1,6 @@
 package ua.library;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ua.library.exception.InvalidDataException;
@@ -18,9 +19,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Tests for Library Domain and Utilities")
 class LibraryTest {
 
     @Test
+    @DisplayName("Should correctly create Author object with valid data")
     void testValidObjectCreation() {
         Author author = Author.of("AUTH-001", "Ivan", 1990);
         assertNotNull(author);
@@ -28,6 +31,7 @@ class LibraryTest {
     }
 
     @Test
+    @DisplayName("Should throw IllegalArgumentException when Author name is blank")
     void testInvalidObjectCreationThrowsException() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
             Author.of("AUTH-001", "", 1990);
@@ -36,6 +40,7 @@ class LibraryTest {
     }
 
     @Test
+    @DisplayName("Should accurately calculate loan duration in days")
     void testLoanDaysCalculation() {
         Author author = Author.of("AUTH-001", "Ivan", 1990);
         Book book = Book.of("978-966-123-456-7", "Book", author, "FICTION", 2000);
@@ -46,6 +51,7 @@ class LibraryTest {
     }
 
     @Test
+    @DisplayName("Should accurately calculate overdue days for a returned book")
     void testOverdueDaysCalculation() {
         Author author = Author.of("AUTH-001", "Ivan", 1990);
         Book book = Book.of("978-966-123-456-7", "Book", author, "FICTION", 2000);
@@ -56,6 +62,7 @@ class LibraryTest {
     }
 
     @Test
+    @DisplayName("Should load valid rows and skip invalid data gracefully")
     void testCsvLoaderWithValidAndInvalidRows(@TempDir Path tempDir) throws IOException {
         Path file = tempDir.resolve("test.csv");
         Files.writeString(file, "code,name,year\nAUTH-001,Valid Name,1990\nAUTH-002,,1990\nAUTH-003,Invalid Year,1000");
@@ -66,6 +73,7 @@ class LibraryTest {
     }
 
     @Test
+    @DisplayName("Should preserve correct message and cause in InvalidDataException")
     void testInvalidDataExceptionMessageAndCause() {
         Throwable cause = new IllegalArgumentException("Bad year");
         InvalidDataException e = new InvalidDataException("Row 2: error", cause);

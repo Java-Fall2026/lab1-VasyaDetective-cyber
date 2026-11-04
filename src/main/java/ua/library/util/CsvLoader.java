@@ -44,17 +44,17 @@ public class CsvLoader {
     }
 
     private static Author parseAuthor(String line, int lineNumber) throws InvalidDataException {
-        String[] parts = line.split(",");
-        if (parts.length != 3) {
-            throw new InvalidDataException("Row " + lineNumber + ": Invalid column count");
-        }
+        String[] parts = line.split(",", -1);
 
         try {
+            if (parts.length != 3) {
+                throw new InvalidDataException("Row " + lineNumber + ": Invalid column count");
+            }
             String code = parts[0].trim();
             String name = parts[1].trim();
             int birthYear = Integer.parseInt(parts[2].trim());
             return Author.of(code, name, birthYear);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
             throw new InvalidDataException("Row " + lineNumber + ": " + e.getMessage(), e);
         }
     }
