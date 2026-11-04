@@ -1,14 +1,13 @@
 package ua.library.util;
 
 import ua.library.model.BookLoan;
+import ua.library.model.Genre;
+import ua.library.model.LoanStatus;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 public class LibraryUtils {
     
-    static final List<String> ALLOWED_GENRES = List.of("FICTION", "SCIENCE", "HISTORY", "BIOGRAPHY");
-    static final List<String> ALLOWED_STATUSES = List.of("ACTIVE", "RETURNED", "OVERDUE");
     static final int MIN_AUTHOR_BIRTH_YEAR = 1800;
 
     private LibraryUtils() {}
@@ -29,18 +28,6 @@ public class LibraryUtils {
         String trimmed = processString(value, "Reader ticket number");
         ValidationHelper.checkPattern(trimmed, "^[A-Z0-9-]{5,10}$", "Reader ticket number");
         return trimmed;
-    }
-    
-    public static String processGenre(String genre) {
-        String normalized = FormatHelper.normalizeUpper(genre);
-        ValidationHelper.checkEnum(normalized, ALLOWED_GENRES, "Genre");
-        return normalized;
-    }
-    
-    public static String processStatus(String status) {
-        String normalized = FormatHelper.normalizeUpper(status);
-        ValidationHelper.checkEnum(normalized, ALLOWED_STATUSES, "Status");
-        return normalized;
     }
 
     public static void requireNotNull(Object value, String fieldName) {
@@ -81,5 +68,20 @@ public class LibraryUtils {
         }
         return loan.getReturnDate().isAfter(loan.getDueDate()) ? 
                ChronoUnit.DAYS.between(loan.getDueDate(), loan.getReturnDate()) : 0;
+    }
+
+    public static String getStatusDescription(LoanStatus status) {
+        return switch (status) {
+            case ACTIVE -> "Книга зараз у читача";
+            case RETURNED -> "Книгу успішно повернуто";
+            case OVERDUE -> "Увага! Термін повернення минув";
+        };
+    }
+
+    public static String getGenreCategory(Genre genre) {
+        return switch (genre) {
+            case FICTION -> "Entertaining Literature";
+            case SCIENCE, HISTORY, BIOGRAPHY -> "Educational Literature";
+        };
     }
 }

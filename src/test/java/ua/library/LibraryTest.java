@@ -7,6 +7,8 @@ import ua.library.exception.InvalidDataException;
 import ua.library.model.Author;
 import ua.library.model.Book;
 import ua.library.model.BookLoan;
+import ua.library.model.Genre;
+import ua.library.model.LoanStatus;
 import ua.library.model.Reader;
 import ua.library.util.CsvLoader;
 import ua.library.util.LibraryUtils;
@@ -39,13 +41,13 @@ class LibraryTest {
         assertTrue(e.getMessage().contains("must not be blank"));
     }
 
-    @Test
+ @Test
     @DisplayName("Should accurately calculate loan duration in days")
     void testLoanDaysCalculation() {
         Author author = Author.of("AUTH-001", "Ivan", 1990);
-        Book book = Book.of("978-966-123-456-7", "Book", author, "FICTION", 2000);
-        Reader reader = new Reader("TKT-001", "Petro", LocalDate.of(2000, 1, 1));
-        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), null, "ACTIVE");
+        Book book = new Book("978-966-123-456-7", "Book", author, Genre.FICTION, 2000);
+        Reader reader = new Reader("TKT-001", "Ivan Franko", LocalDate.of(2005, 5, 15));
+        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(10), LocalDate.now().plusDays(5), null, LoanStatus.ACTIVE);
 
         assertEquals(15, LibraryUtils.loanDays(loan));
     }
@@ -54,9 +56,9 @@ class LibraryTest {
     @DisplayName("Should accurately calculate overdue days for a returned book")
     void testOverdueDaysCalculation() {
         Author author = Author.of("AUTH-001", "Ivan", 1990);
-        Book book = Book.of("978-966-123-456-7", "Book", author, "FICTION", 2000);
-        Reader reader = new Reader("TKT-001", "Petro", LocalDate.of(2000, 1, 1));
-        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(10), LocalDate.now().minusDays(5), LocalDate.now().minusDays(2), "OVERDUE");
+        Book book = new Book("978-966-123-456-7", "Book", author, Genre.FICTION, 2000);
+        Reader reader = new Reader("TKT-001", "Ivan Franko", LocalDate.of(2005, 5, 15));
+        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(10), LocalDate.now().minusDays(5), LocalDate.now().minusDays(2), LoanStatus.OVERDUE);
 
         assertEquals(3, LibraryUtils.overdueDays(loan));
     }
