@@ -8,6 +8,6 @@ public record Book(String isbn, String title, Author author, Genre genre, int pu
         title = LibraryUtils.processString(title, "Book title");
         LibraryUtils.requireNotNull(author, "Author");
         LibraryUtils.requireNotNull(genre, "Genre");
-        LibraryUtils.validatePublishYear(publishedYear, author.birthYear());
+        LibraryUtils.validatePublishYear(publishedYear, author.getBirthYear());
     }
 }
