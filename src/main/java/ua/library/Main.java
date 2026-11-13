@@ -8,6 +8,8 @@ import ua.library.model.BookLoan;
 import ua.library.model.Genre;
 import ua.library.model.LoanStatus;
 import ua.library.model.Reader;
+import ua.library.exception.DuplicateIdentityException;
+import ua.library.repository.GenericRepository;
 import ua.library.util.CsvLoader;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,27 +18,39 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        log.info("--- Starting Lab 3 demonstration ---");
-
-        List<Author> authors = CsvLoader.loadAuthors("data/authors.csv");
-        System.out.println(authors);
-
-        CsvLoader.loadAuthors("data/missing_file.csv");
+        log.info("--- Starting Lab 4 demonstration ---");
 
         Author author = Author.of("AUTH-001", "Taras Shevchenko", 1814);
         Book book = new Book("978-966-123-456-7", "Kobzar", author, Genre.FICTION, 1840);
         Reader reader = new Reader("TKT-001", "Ivan Franko", LocalDate.of(2005, 5, 15));
-        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(5), LocalDate.now().plusDays(5), null, LoanStatus.ACTIVE);
+        BookLoan loan = new BookLoan(book, reader, LocalDate.now().minusDays(5),
+                LocalDate.now().plusDays(5), null, LoanStatus.ACTIVE);
 
-        try {
-            loan.setStatus(LoanStatus.valueOf("UNKNOWN"));
-        } catch (IllegalArgumentException e) {
-            log.warn("Domain rule violation caught in setter: {}", e.getMessage());
+        GenericRepository<Book> books = new GenericRepository<>("Books", Book::isbn);
+        GenericRepository<Reader> readers = new GenericRepository<>("Readers", Reader::readerTicketNumber);
+        GenericRepository<BookLoan> loans = new GenericRepository<>("Book loans",
+                item -> item.getBook().isbn() + ":" + item.getReader().readerTicketNumber() + ":" + item.getIssueDate());
+
+        books.add(book);
+        readers.add(reader);
+        loans.add(loan);
+        System.out.println("Знайдено книгу: " + books.findByIdentity(book.isbn()).orElseThrow());
+        System.out.println("Відсутній читач: " + readers.findByIdentity("TKT-999").isEmpty());
+
+        List<Author> authors = CsvLoader.loadAuthors("data/authors.csv");
+        GenericRepository<Author> authorsRepository = new GenericRepository<>("Authors", Author::getAuthorCode);
+        for (Author csvAuthor : authors) {
+            try {
+                authorsRepository.add(csvAuthor);
+            } catch (DuplicateIdentityException e) {
+                System.out.println("Перехоплено дубліката: " + e.getMessage());
+            }
         }
+        System.out.println("Кількість авторів: " + authorsRepository.size());
+        System.out.println("Дублікат через addIfAbsent: " + authorsRepository.addIfAbsent(author));
+        System.out.println("Видалення наявного елемента: " + authorsRepository.removeByIdentity("AUTH-004"));
+        System.out.println("Видалення відсутнього елемента: " + authorsRepository.removeByIdentity("AUTH-999"));
 
-        log.info("--- Lab 3 demonstration finished ---");
+        log.info("--- Lab 4 demonstration finished ---");
     }
 }
-// ua.library.util.ValidationHelper.checkNotNull(author, "Author");
-// The line above does not compile because ValidationHelper is package-private
-// and cannot be accessed from outside the ua.library.util package.
