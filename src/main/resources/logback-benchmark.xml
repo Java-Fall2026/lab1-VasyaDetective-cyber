@@ -1,0 +1,4 @@
+<configuration>
+    <logger name="ua.library.repository.GenericRepository" level="OFF"/>
+    <root level="OFF"/>
+</configuration>
