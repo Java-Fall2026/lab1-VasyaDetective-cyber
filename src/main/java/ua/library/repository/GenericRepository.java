@@ -35,7 +35,6 @@ public class GenericRepository<T> {
             DuplicateIdentityException exception = new DuplicateIdentityException(
                     "Duplicate identity '" + identity + "' in repository '" + name + "'");
             log.warn("Rejected duplicate identity '{}' in repository '{}'", identity, name);
-            log.error("Adding duplicate identity failed", exception);
             throw exception;
         }
         items.put(identity, item);

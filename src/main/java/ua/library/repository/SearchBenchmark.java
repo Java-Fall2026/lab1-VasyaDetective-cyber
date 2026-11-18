@@ -3,9 +3,7 @@ package ua.library.repository;
 import ua.library.model.Reader;
 
 import java.time.LocalDate;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public class SearchBenchmark {
@@ -21,16 +19,12 @@ public class SearchBenchmark {
         }
 
         List<Reader> list = repository.findAll();
-        Map<String, Reader> map = new LinkedHashMap<>();
-        for (Reader reader : list) {
-            map.put(extractor.identityOf(reader), reader);
-        }
         String[] identities = {"R00000000", "R00099999", "R99999999"};
         String[] scenarios = {"first", "last", "missing"};
 
         for (int i = 0; i < identities.length; i++) {
-            warmUp(map, list, identities[i], extractor);
-            long mapTime = measureMap(map, identities[i]);
+            warmUp(repository, list, identities[i], extractor);
+            long mapTime = measureMap(repository, identities[i]);
             long listTime = measureList(list, identities[i], extractor);
             System.out.printf("%s: Map=%d ns, List=%d ns%n", scenarios[i], mapTime, listTime);
         }
@@ -45,19 +39,19 @@ public class SearchBenchmark {
         return Optional.empty();
     }
 
-    private static void warmUp(Map<String, Reader> map, List<Reader> list,
+    private static void warmUp(GenericRepository<Reader> repository, List<Reader> list,
                                String identity, IdentityExtractor<Reader> extractor) {
         for (int i = 0; i < 10_000; i++) {
-            map.get(identity);
+            repository.findByIdentity(identity);
             linearSearch(list, identity, extractor);
         }
     }
 
-    private static long measureMap(Map<String, Reader> map, String identity) {
+    private static long measureMap(GenericRepository<Reader> repository, String identity) {
         long[] times = new long[REPETITIONS];
         for (int i = 0; i < REPETITIONS; i++) {
             long start = System.nanoTime();
-            map.get(identity);
+            repository.findByIdentity(identity);
             times[i] = System.nanoTime() - start;
         }
         return minimum(times);

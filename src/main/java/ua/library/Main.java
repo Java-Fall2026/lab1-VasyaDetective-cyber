@@ -34,8 +34,16 @@ public class Main {
         books.add(book);
         readers.add(reader);
         loans.add(loan);
+        String loanIdentity = book.isbn() + ":" + reader.readerTicketNumber() + ":" + loan.getIssueDate();
+        System.out.println("Розмір Books після add: " + books.size());
+        System.out.println("Розмір Readers після add: " + readers.size());
+        System.out.println("Розмір Book loans після add: " + loans.size());
         System.out.println("Знайдено книгу: " + books.findByIdentity(book.isbn()).orElseThrow());
-        System.out.println("Відсутній читач: " + readers.findByIdentity("TKT-999").isEmpty());
+        System.out.println("Книгу не знайдено: " + books.findByIdentity("978-000-000-000-0").isEmpty());
+        System.out.println("Знайдено читача: " + readers.findByIdentity(reader.readerTicketNumber()).isPresent());
+        System.out.println("Читача не знайдено: " + readers.findByIdentity("TKT-999").isEmpty());
+        System.out.println("Знайдено видачу: " + loans.findByIdentity(loanIdentity).isPresent());
+        System.out.println("Видачу не знайдено: " + loans.findByIdentity("missing-loan").isEmpty());
 
         List<Author> authors = CsvLoader.loadAuthors("data/authors.csv");
         GenericRepository<Author> authorsRepository = new GenericRepository<>("Authors", Author::getAuthorCode);
@@ -48,6 +56,7 @@ public class Main {
         }
         System.out.println("Кількість авторів: " + authorsRepository.size());
         System.out.println("Дублікат через addIfAbsent: " + authorsRepository.addIfAbsent(author));
+        System.out.println("Розмір Authors після addIfAbsent: " + authorsRepository.size());
         System.out.println("Видалення наявного елемента: " + authorsRepository.removeByIdentity("AUTH-004"));
         System.out.println("Видалення відсутнього елемента: " + authorsRepository.removeByIdentity("AUTH-999"));
 
