@@ -10,6 +10,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class GenericRepository<T> {
     private static final Logger log = LoggerFactory.getLogger(GenericRepository.class);
@@ -86,6 +88,28 @@ public class GenericRepository<T> {
     public List<T> findAll() {
         log.info("Returned {} items from repository '{}'", items.size(), name);
         return new ArrayList<>(items.values());
+    }
+
+    public List<T> findAllSorted(Comparator<T> comparator) {
+        if (comparator == null) {
+            throw new IllegalArgumentException("Comparator must not be null");
+        }
+        return stream().sorted(comparator).toList();
+    }
+
+    public List<T> findAllSortedByIdentity(SortOrder order) {
+        if (order == null) {
+            throw new IllegalArgumentException("Sort order must not be null");
+        }
+        Comparator<T> comparator = Comparator.comparing(extractor::identityOf);
+        if (order == SortOrder.DESCENDING) {
+            comparator = comparator.reversed();
+        }
+        return findAllSorted(comparator);
+    }
+
+    public Stream<T> stream() {
+        return items.values().stream();
     }
 
     public int size() {

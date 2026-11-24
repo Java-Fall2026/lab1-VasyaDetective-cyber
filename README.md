@@ -23,3 +23,21 @@ Benchmark виконується для 100 000 читачів. Час наве�
 Benchmark запускається класом `ua.library.repository.SearchBenchmark`.
 
 Для benchmark використовується окремий конфігураційний файл `logback-benchmark.xml`, який вимикає логування `GenericRepository` на час вимірювань.
+
+## Лабораторна робота №5
+
+Додано `BookRepository` і `ReaderRepository`, які успадковують `GenericRepository<T>`.
+Для `Book` природний порядок визначається ISBN, а для `Reader` — номером читацького квитка.
+Порівняння виконується через `compareTo`, без віднімання чисел.
+
+`GenericRepository` підтримує `findAllSorted`, сортування за identity в обох напрямках
+через `findAllSortedByIdentity` і одноразовий `stream()`. `findAll()` повертає захисну
+копію, а повторне використання вже спожитого стріму викликає `IllegalStateException`.
+
+У `Main` показані пошук через `filter`, перетворення через `map`, сортування, `distinct`,
+`limit`, `flatMap`, `groupingBy`, підрахунок по групах, `reduce`, `summaryStatistics`,
+`Optional.empty()` і агрегація порожньої колекції.
+
+`TreeSet` сортує книги лише за назвою. Дві різні книги з однаковою назвою вважаються
+однаковими для цього набору, бо компаратор повертає `0`, тому друга книга не додається.
+Це демонструє, чому порядок відсортованої колекції бажано узгоджувати з `equals`.
