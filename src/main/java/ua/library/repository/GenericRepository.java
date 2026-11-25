@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class GenericRepository<T> {
@@ -94,7 +94,9 @@ public class GenericRepository<T> {
         if (comparator == null) {
             throw new IllegalArgumentException("Comparator must not be null");
         }
-        return stream().sorted(comparator).toList();
+        List<T> result = stream().sorted(comparator).toList();
+        log.info("Sorted {} items in repository '{}'", result.size(), name);
+        return result;
     }
 
     public List<T> findAllSortedByIdentity(SortOrder order) {
@@ -102,10 +104,12 @@ public class GenericRepository<T> {
             throw new IllegalArgumentException("Sort order must not be null");
         }
         Comparator<T> comparator = Comparator.comparing(extractor::identityOf);
-        if (order == SortOrder.DESCENDING) {
+        if (order == SortOrder.DESC) {
             comparator = comparator.reversed();
         }
-        return findAllSorted(comparator);
+        List<T> result = stream().sorted(comparator).toList();
+        log.info("Sorted {} items in repository '{}' by identity in {} order", result.size(), name, order);
+        return result;
     }
 
     public Stream<T> stream() {
