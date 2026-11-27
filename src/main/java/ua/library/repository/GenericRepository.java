@@ -9,7 +9,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class GenericRepository<T> {
     private static final Logger log = LoggerFactory.getLogger(GenericRepository.class);
@@ -86,6 +88,32 @@ public class GenericRepository<T> {
     public List<T> findAll() {
         log.info("Returned {} items from repository '{}'", items.size(), name);
         return new ArrayList<>(items.values());
+    }
+
+    public List<T> findAllSorted(Comparator<T> comparator) {
+        if (comparator == null) {
+            throw new IllegalArgumentException("Comparator must not be null");
+        }
+        List<T> result = stream().sorted(comparator).toList();
+        log.info("Sorted {} items in repository '{}'", result.size(), name);
+        return result;
+    }
+
+    public List<T> findAllSortedByIdentity(SortOrder order) {
+        if (order == null) {
+            throw new IllegalArgumentException("Sort order must not be null");
+        }
+        Comparator<T> comparator = Comparator.comparing(extractor::identityOf);
+        if (order == SortOrder.DESC) {
+            comparator = comparator.reversed();
+        }
+        List<T> result = stream().sorted(comparator).toList();
+        log.info("Sorted {} items in repository '{}' by identity in {} order", result.size(), name, order);
+        return result;
+    }
+
+    public Stream<T> stream() {
+        return items.values().stream();
     }
 
     public int size() {
